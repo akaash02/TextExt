@@ -106,7 +106,9 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+
     backgroundColor: "#1e1e2e", // Dark canvas background
+
   },
   header: {
     padding: 16,
