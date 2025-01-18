@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   SafeAreaView,
   FlatList,
@@ -6,32 +6,34 @@ import {
   RefreshControl,
   Text,
   View,
+  TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native"; // For navigation
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { images } from "../../constants";
-import { getUsername, getUserModules } from "../../lib/appwrite"; // Updated import for fetching user modules
-import { EmptyState, InfoBox, CustomButton } from "../../components";
-import { requestNotificationPermission, scheduleNotification } from "../Notifications";
+import { getUsername, getUserModules } from "../../lib/appwrite";
+import { EmptyState, CustomButton } from "../../components";
+import { scheduleNotification } from "../Notifications";
 
 const Home = () => {
   const navigation = useNavigation();
   const [username, setUsername] = useState("");
-  const [modules, setModules] = useState([]); // Updated to reflect user modules
+  const [modules, setModules] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Fetch user data (username and modules)
   const fetchData = async () => {
     try {
       const fetchedUsername = await getUsername();
       setUsername(fetchedUsername || "Guest");
 
-      const fetchedModules = await getUserModules(); // Fetch user modules
+      const fetchedModules = await getUserModules();
       setModules(fetchedModules);
 
       fetchedModules.forEach((moduleName) => {
         scheduleNotification(
           `Reminder: ${moduleName}`,
           `Check out your module: ${moduleName}`,
-          new Date(Date.now() + 3600 * 1000) // Example: Notify in 1 hour
+          new Date(Date.now() + 3600 * 1000)
         );
       });
     } finally {
@@ -39,19 +41,20 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    const initialize = async () => {
-      const hasPermission = await requestNotificationPermission();
-      if (hasPermission) await fetchData();
-    };
-    initialize();
-  }, []);
+  // Re-fetch data when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
+  // Pull-to-refresh functionality
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchData();
   };
 
+  // Navigate to create course page
   const handleCreateCourse = () => {
     navigation.navigate("create"); // Navigate to the create page
   };
@@ -59,45 +62,56 @@ const Home = () => {
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
-        keyExtractor={(item, index) => index.toString()} // Modules are strings, so use index as key
-        data={modules} // Use modules as the data source
+        keyExtractor={(item, index) => index.toString()}
+        data={modules}
         renderItem={({ item }) => (
-          <View className="flex-1 justify-center items-center bg-primary p-4">
-           <InfoBox
-            title={item} // Dynamic title
-            containerStyles="bg-gray-100 rounded-xl min-h-[62px] flex flex-row justify-center items-center" // Style for the InfoBox container
-            titleStyles="text-primary font-psemibold absolute bottom-5 left-4 right-4 p-4 rounded-lg" // Center the title text
-           />
-          </View>
-
+          <TouchableOpacity onPress={() => handleModulePress(item)}>
+            <View className="w-full px-4 mb-4">
+              <View className="bg-gray-100 shadow-lg rounded-lg p-4">
+                <Text className="text-primary font-semibold text-lg text-center">
+                  {item}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={
-          <EmptyState title="No modules found" subtitle="Create a course to get started" />
+          <EmptyState
+            title="No modules found"
+            subtitle="Create a module to get started"
+          />
         }
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListHeaderComponent={() => (
-          <View className="flex-start px-4 space-y-6 mt-2">
-            <View className="flex-start justify-between flex-row mb-6">
+          <View className="px-4 space-y-6" style={{ marginTop: 30 }}>
+            <View className="flex-row justify-between items-center">
               <View>
-                <Text className="text-2xl font-semibold text-white">Welcome Back</Text>
-                <Text className="text-2xl font-semibold text-white">{username || "Loading..."}</Text>
-                <Text className="text-lg font-semibold text-gray-100 mt-2">Your Modules</Text>
+                <Text className="text-2xl font-semibold text-white">
+                  Welcome Back
+                </Text>
+                <Text className="text-2xl font-semibold text-white">
+                  {username || "Loading..."}
+                </Text>
+                <Text className="text-lg font-semibold text-gray-100 mt-2">
+                  Your Modules
+                </Text>
               </View>
-              <View className="mt-1.5">
-                <Image
-                  source={images.logoSmall}
-                  className="w-12 h-12 items-end"
-                  resizeMode="contain"
-                />
-              </View>
+              <Image
+                source={images.logoSmall}
+                className="w-12 h-12"
+                resizeMode="contain"
+              />
             </View>
           </View>
         )}
       />
       <CustomButton
-        title="Create a course"
+        title="Create a module"
         handlePress={handleCreateCourse}
-        containerStyles="absolute bottom-5 left-4 right-4 p-4 rounded-lg"
+        containerStyles="absolute bottom-5 left-4 right-4 p-4 bg-secondary rounded-lg"
+        textStyles="text-white font-bold"
       />
     </SafeAreaView>
   );
