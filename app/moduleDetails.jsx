@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   Text,
@@ -10,10 +10,12 @@ import {
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 const ModuleDetails = () => {
-  const [loading, setLoading] = useState(true); // Loading state
-  const [moduleDetails, setModuleDetails] = useState(null); // State for module details
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { moduleName } = route.params; // Retrieve module name from navigation params
   const [isUploading, setIsUploading] = useState(false); // Upload state
   const [selectedFile, setSelectedFile] = useState(null); // Selected PDF
 
@@ -58,14 +60,6 @@ const ModuleDetails = () => {
       Alert.alert("Success", `PDF selected: ${file.name}`);
 
       // Upload file logic can go here
-      // const formData = new FormData();
-      // formData.append('pdf', {
-      //   uri: file.uri,
-      //   type: 'application/pdf',
-      //   name: file.name,
-      // });
-      // await uploadToServer(formData);
-
     } catch (error) {
       console.error("Error picking document:", error);
       Alert.alert("Error", "Failed to select PDF. Please try again.");
@@ -74,40 +68,19 @@ const ModuleDetails = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchModuleDetails = () => {
-      setTimeout(() => {
-        // Mock module details (can replace with real data later)
-        setModuleDetails({
-          moduleName: "CS2102",
-          description: "Introduction to Database Systems.",
-          instructor: "Prof. John Doe",
-          credits: 4,
-        });
-        setLoading(false);
-      }, 2000);
-    };
-
-    fetchModuleDetails();
-  }, []);
-
-  if (loading) {
-    return (
-      <SafeAreaView style={{ backgroundColor: "#1c1c1c", flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="white" />
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={{ backgroundColor: "#1c1c1c", flex: 1 }}>
       <ScrollView style={{ paddingHorizontal: 16, paddingTop: 20 }}>
+        {/* Back Button */}
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 24, color: "#007aff", fontWeight: "bold" }}>← Back</Text>
+        </TouchableOpacity>
+
         {/* Module Header */}
         <View style={{ marginTop: 20 }}>
-          <Text style={{ fontSize: 32, color: "white", fontWeight: "600" }}>{moduleDetails.moduleName}</Text>
-          <Text style={{ fontSize: 18, color: "#d3d3d3", marginTop: 10 }}>{moduleDetails.description}</Text>
-          <Text style={{ fontSize: 16, color: "white", marginTop: 20 }}>Instructor: {moduleDetails.instructor}</Text>
-          <Text style={{ fontSize: 16, color: "white", marginTop: 10 }}>Credits: {moduleDetails.credits}</Text>
+          <Text style={{ fontSize: 32, color: "white", fontWeight: "600" }}>
+            {moduleName || "Module Name"}
+          </Text>
         </View>
 
         {/* Quizzes and Summaries Buttons */}
