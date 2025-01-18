@@ -11,6 +11,9 @@ import {
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import { Link } from "expo-router";
+import Quiz from "./quiz";
+
 
 const ModuleDetails = () => {
   const route = useRoute();
@@ -85,24 +88,28 @@ const ModuleDetails = () => {
 
         {/* Quizzes and Summaries Buttons */}
         <View style={{ marginTop: 30, gap: 16 }}>
-          <TouchableOpacity
-            onPress={handleQuizzesPress}
-            style={{
-              backgroundColor: "#0044cc",
-              paddingVertical: 18,
-              borderRadius: 12,
-              alignItems: "center",
-              justifyContent: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 10,
-              elevation: 5,
-            }}
-          >
-            <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>Quizzes</Text>
-          </TouchableOpacity>
-
+          <Link href={"/quiz"}>
+            <View
+              style={{
+                backgroundColor: "#007aff",
+                paddingVertical: 18,
+                borderRadius: 12,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 10,
+                elevation: 5,
+                width: "100%", // Make the View extend across the screen
+                alignSelf: "stretch", // Ensure it stretches horizontally
+              }}
+            >
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", textAlign: "center" }}>
+                Quizzes
+              </Text>
+            </View>
+          </Link>
           <TouchableOpacity
             onPress={handleSummariesPress}
             style={{
