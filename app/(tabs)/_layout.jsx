@@ -7,7 +7,7 @@ const TabIcon = ({ icon, color, name, focused }) => {
   return (
 
     <View className="flex items-center justify-end gap-2"
-    style={{ width: 100, height: 100 }}>
+      style={{ width: 100, height: 100 }}>
       <Image
         source={icon}
         resizeMode="contain"
@@ -47,11 +47,11 @@ const TabsLayout = () => {
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-              icon={icons.home}
-              color={color}
-              name="Home"
-              focused={focused}
-            />
+                icon={icons.home}
+                color={color}
+                name="Home"
+                focused={focused}
+              />
             )
           }}
         />
@@ -62,12 +62,12 @@ const TabsLayout = () => {
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-              icon={icons.calendar}
-              color={color}
-              name="Meetings"
-              focused={focused}
-              size={28}
-            />
+                icon={icons.calendar}
+                color={color}
+                name="Meetings"
+                focused={focused}
+                size={28}
+              />
             )
           }}
         />
@@ -78,11 +78,11 @@ const TabsLayout = () => {
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-              icon={icons.tasks}
-              color={color}
-              name="Tasks"
-              focused={focused}
-            />
+                icon={icons.tasks}
+                color={color}
+                name="Tasks"
+                focused={focused}
+              />
             )
           }}
         />
@@ -93,13 +93,30 @@ const TabsLayout = () => {
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
-              icon={icons.profile}
-              color={color}
-              name="Profile"
-              focused={focused}
-            />
+                icon={icons.profile}
+                color={color}
+                name="Profile"
+                focused={focused}
+              />
             )
           }}
+        />
+
+        <Tabs.Screen
+          name="quiz"
+          options={{
+            title: 'Quiz',
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                icon={icons.profile}
+                color={color}
+                name="Quiz"
+                focused={focused}
+              />
+            )
+          }}
+
         />
 
       </Tabs>
