@@ -10,12 +10,13 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import { useRoute } from "@react-navigation/native"; 
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { Link } from "expo-router";
+import Quiz from "./quiz";
+import { CustomButton } from "../components"
 
-
-import { useNavigation } from "@react-navigation/native";
 
 const ModuleDetails = () => {
   const route = useRoute();
@@ -76,66 +77,50 @@ const ModuleDetails = () => {
   return (
 <SafeAreaView style={{ backgroundColor: "#1c1c1c", flex: 1 }}>
   <ScrollView style={{ paddingHorizontal: 16, paddingTop: 20 }}>
-    {/* Back Button */}
-    <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 20 }}>
-      <Text style={{ fontSize: 24, color: "#007aff", fontWeight: "bold" }}>← Back</Text>
-    </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className = "flex-row align-centre"
+        >
+          <Text className="text-4xl text-white mr-2">←</Text>
+        </TouchableOpacity>
 
-    {/* Module Header */}
     <View style={{ marginTop: 20 }}>
-      <Text style={{ fontSize: 32, color: "white", fontWeight: "600" }}>
+    <Text className="text-2xl font-semibold text-gray-100" >
+        Module Details
+      </Text>
+      <Text className="text-3xl font-semibold text-white mt-2 mb-5 " >
         {moduleName}
       </Text>
     </View>
-
-    {/* Quizzes and Summaries Buttons */}
-    <View style={{ marginTop: 30, gap: 16 }}>
-      <TouchableOpacity
-        onPress={handleQuizzesPress}
-        style={{
-          backgroundColor: "#0044cc",
-          paddingVertical: 18,
-          borderRadius: 12,
-          alignItems: "center",
-          justifyContent: "center",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 10,
-          elevation: 5,
-        }}
-      >
-        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>Quizzes</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={handleSummariesPress}
-        style={{
-          backgroundColor: "#007aff",
-          paddingVertical: 18,
-          borderRadius: 12,
-          alignItems: "center",
-          justifyContent: "center",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 10,
-          elevation: 5,
-        }}
-      >
-        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>Summaries</Text>
-      </TouchableOpacity>
-    </View>
-
-    {/* Upload PDF Button */}
-    <View style={{ marginTop: 30 }}>
-      <TouchableOpacity
-        onPress={handleUpload}
-        style={{
+        <View className=" space-y-4">
+         <CustomButton
+           title="Quizzes"
+           handlePress={handleQuizzesPress}
+           containerStyles={{ width: "100%", alignSelf: "stretch" }}
+           textStyles={{ textAlign: "center" }}
+           isLoading={false} // Pass `true` if loading state is required
+         />
+        </View>
+        <View className="mt-4">
+        <CustomButton
+            title="Summaries"
+            handlePress={handleSummariesPress}
+            containerStyles={{
+              width: "100%", alignSelf: "stretch", 
+            }}
+            textStyles={{
+              textAlign: "center"
+            }}
+          />
+        </View>
+    <View className="mt-4">
+      <CustomButton
+        title={selectedFile ? `PDF: ${selectedFile.name}` : "Upload PDF"}
+        handlePress={handleUpload}
+        containerStyles={{
           backgroundColor: "#6200EE",
           paddingVertical: 15,
           paddingHorizontal: 30,
-          borderRadius: 10,
           minWidth: 250,
           alignItems: "center",
           justifyContent: "center",
@@ -145,29 +130,30 @@ const ModuleDetails = () => {
           shadowRadius: 10,
           elevation: 5,
         }}
-        disabled={isUploading}
-      >
-        {isUploading ? (
-          <ActivityIndicator color="#FFFFFF" />
-        ) : (
-          <Text style={{ color: "#FFFFFF", fontSize: 16, fontWeight: "bold" }}>
-            {selectedFile ? `PDF: ${selectedFile.name}` : "Upload PDF"}
-          </Text>
-        )}
-      </TouchableOpacity>
+        textStyles={{ fontSize: 16, fontWeight: "bold" }}
+        isLoading={isUploading}
+      />
 
       {selectedFile && (
-        <View style={{ backgroundColor: "#FFFFFF", padding: 15, borderRadius: 10, marginTop: 20 }}>
-          <Text style={{ fontSize: 16, color: "#333" }}>Selected File: {selectedFile.name}</Text>
+        <View
+          style={{
+            backgroundColor: "#FFFFFF",
+            padding: 15,
+            borderRadius: 10,
+            marginTop: 20,
+          }}
+        >
+          <Text style={{ fontSize: 16, color: "#333" }}>
+            Selected File: {selectedFile.name}
+          </Text>
           <Text style={{ fontSize: 14, color: "#666" }}>
             Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
           </Text>
         </View>
       )}
     </View>
-  </ScrollView>
-</SafeAreaView>
-
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

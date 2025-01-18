@@ -42,11 +42,11 @@ const RootLayout = () => {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="search/[query]" options={{ headerShown: false }} />
-        <Stack.Screen name="createMeeting" options={{ headerShown: false}} />
-        <Stack.Screen name="create" options={{ headerShown: false}} />
-        <Stack.Screen name="viewMeetings" options={{ headerShown: false}} />
+        <Stack.Screen name="createMeeting" options={{ headerShown: false }} />
+        <Stack.Screen name="create" options={{ headerShown: false }} />
+        <Stack.Screen name="viewMeetings" options={{ headerShown: false }} />
         <Stack.Screen name="moduleDetails" options={{ headerShown: false }} />
+        <Stack.Screen name="quiz" options={{ headerShown: false }} />
       </Stack>
     </GlobalProvider>
   )
