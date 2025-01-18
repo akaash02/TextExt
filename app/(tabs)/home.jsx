@@ -1,37 +1,42 @@
 import { useState, useEffect } from "react";
-import { SafeAreaView, FlatList, Image, RefreshControl, Text, View, StyleSheet } from "react-native";
-import { router } from "expo-router";
+import {
+  SafeAreaView,
+  FlatList,
+  Image,
+  RefreshControl,
+  Text,
+  View,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native"; // For navigation
 import { images } from "../../constants";
-import { getUsername, getCourses } from "../../lib/appwrite"; // Import getCourses function
-import { EmptyState, TaskCard, CustomButton } from "../../components";
+import { getUsername, getUserModules } from "../../lib/appwrite"; // Updated import for fetching user modules
+import { EmptyState, InfoBox, CustomButton } from "../../components";
 import { requestNotificationPermission, scheduleNotification } from "../Notifications";
-import { useNavigation } from "@react-navigation/native"; // For navigation to Create page
 
 const Home = () => {
-  const navigation = useNavigation(); // Hook for navigation to Create page
-  const [username, setUsername] = useState('');
-  const [courses, setCourses] = useState([]);  // Renamed tasks to courses
+  const navigation = useNavigation();
+  const [username, setUsername] = useState("");
+  const [modules, setModules] = useState([]); // Updated to reflect user modules
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = async () => {
-    const fetchedUsername = await getUsername();
-    setUsername(fetchedUsername || 'Guest');
+    try {
+      const fetchedUsername = await getUsername();
+      setUsername(fetchedUsername || "Guest");
 
-    const fetchedCourses = await getCourses();  // Fetch the courses
-    setCourses(fetchedCourses);
+      const fetchedModules = await getUserModules(); // Fetch user modules
+      setModules(fetchedModules);
 
-    fetchedCourses.forEach((course) => {
-      if (course.dateOfCreation) {
-        const creationDate = new Date(course.dateOfCreation);
-        if (creationDate > new Date()) {
-          scheduleNotification(
-            `New Course Reminder: ${course.title || "Untitled Course"}`,
-            `Created on ${creationDate.toDateString()}`,
-            creationDate
-          );
-        }
-      }
-    });
+      fetchedModules.forEach((moduleName) => {
+        scheduleNotification(
+          `Reminder: ${moduleName}`,
+          `Check out your module: ${moduleName}`,
+          new Date(Date.now() + 3600 * 1000) // Example: Notify in 1 hour
+        );
+      });
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   useEffect(() => {
@@ -45,130 +50,57 @@ const Home = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchData();
-    setRefreshing(false);
   };
 
   const handleCreateCourse = () => {
-    navigation.navigate("create"); // Navigate to Create page on button click
+    navigation.navigate("create"); // Navigate to the create page
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View>
-            <Text style={styles.welcomeText}>Welcome Back</Text>
-            <Text style={styles.usernameText}>
-              {username || 'Loading...'}
-            </Text>
-          </View>
-          <Image source={images.logo} style={styles.logo} resizeMode="contain" />
-        </View>
-        <Text style={styles.tasksTitle}>Your Courses</Text>
-      </View>
-
+    <SafeAreaView className="bg-primary h-full">
       <FlatList
-        keyExtractor={(item) => item.$id}
-        data={courses}  // Use courses here
+        keyExtractor={(item, index) => index.toString()} // Modules are strings, so use index as key
+        data={modules} // Use modules as the data source
         renderItem={({ item }) => (
-          <View style={styles.taskCardContainer}>
-            <TaskCard
-              title={item.title || "Untitled Course"}  // Updated field name
-              creator={item.creator || "Unknown"}  // Updated field name
-              description={item.description || "No description available"}  // Updated field name
-              dueDate={item.dueDate || "No due date"}  // Updated field name
-              priority={item.priority || 0}  // Updated field name
-              category={item.category}  // Updated field name
-            />
+          <View className="flex-1 justify-center items-center bg-primary p-4">
+           <InfoBox
+            title={item} // Dynamic title
+            containerStyles="bg-gray-100 rounded-xl min-h-[62px] flex flex-row justify-center items-center" // Style for the InfoBox container
+            titleStyles="text-primary font-psemibold absolute bottom-5 left-4 right-4 p-4 rounded-lg" // Center the title text
+           />
           </View>
+
         )}
         ListEmptyComponent={
-          <EmptyState
-            title="No courses created"
-            subtitle="Create a course to get started"
-          />
+          <EmptyState title="No modules found" subtitle="Create a course to get started" />
         }
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        contentContainerStyle={courses.length === 0 ? styles.emptyListContainer : null}  // Updated to courses
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        ListHeaderComponent={() => (
+          <View className="flex-start px-4 space-y-6 mt-2">
+            <View className="flex-start justify-between flex-row mb-6">
+              <View>
+                <Text className="text-2xl font-semibold text-white">Welcome Back</Text>
+                <Text className="text-2xl font-semibold text-white">{username || "Loading..."}</Text>
+                <Text className="text-lg font-semibold text-gray-100 mt-2">Your Modules</Text>
+              </View>
+              <View className="mt-1.5">
+                <Image
+                  source={images.logoSmall}
+                  className="w-12 h-12 items-end"
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
+          </View>
+        )}
       />
-
       <CustomButton
         title="Create a course"
-        handlePress={handleCreateCourse} // OnPress will now navigate to the Create page
-        containerStyles={styles.createTaskButton}
+        handlePress={handleCreateCourse}
+        containerStyles="absolute bottom-5 left-4 right-4 p-4 rounded-lg"
       />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-
-    backgroundColor: "#1e1e2e", // Dark canvas background
-
-  },
-  header: {
-    padding: 16,
-    backgroundColor: "#252535", // Slightly lighter background
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: "#333",
-    marginTop: 40,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  welcomeText: {
-    fontSize: 24,
-    color: '#f0f9ff',
-  },
-  usernameText: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#f0f9ff',
-  },
-  logo: {
-    width: 36,
-    height: 40,
-  },
-  tasksTitle: {
-    marginTop: 16,
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#f0f9ff',
-  },
-  taskCardContainer: {
-    backgroundColor: "#2c2c3d", // Card background
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    overflow: "hidden",
-    padding: 8,
-  },
-  createTaskButton: {
-    position: "absolute",
-    bottom: 20,
-    left: 16,
-    right: 16,
-    paddingVertical: 12,
-    backgroundColor: "#6200EE", // Bright accent color
-    borderRadius: 8,
-    elevation: 4,
-  },
-  emptyListContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
 
 export default Home;
