@@ -99,7 +99,7 @@ const Home = () => {
                 <Text className="text-2xl font-semibold text-white">
                   {username || "Loading..."}
                 </Text>
-                <Text className="text-lg font-semibold text-gray-100 mt-2">
+                <Text className="text-lg font-semibold text-gray-100 mt-2 mb-5 ">
                   Your Modules
                 </Text>
               </View>
@@ -115,7 +115,7 @@ const Home = () => {
       <CustomButton
         title="Create a module"
         handlePress={handleCreateCourse}
-        containerStyles="absolute bottom-5 left-4 right-4 p-4 bg-secondary rounded-lg"
+        containerStyles="absolute bottom-5 left-4 right-4 p-4 rounded-lg"
         textStyles="text-white font-bold"
       />
     </SafeAreaView>

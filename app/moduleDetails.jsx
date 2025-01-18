@@ -3,19 +3,25 @@ import {
   SafeAreaView,
   Text,
   View,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
+import { useRoute } from "@react-navigation/native"; // Import useRoute
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+import { images } from "../constants";
 
 const ModuleDetails = () => {
-  const [loading, setLoading] = useState(true); // Loading state
-  const [moduleDetails, setModuleDetails] = useState(null); // State for module details
-  const [isUploading, setIsUploading] = useState(false); // Upload state
-  const [selectedFile, setSelectedFile] = useState(null); // Selected PDF
+  const route = useRoute(); // Access the route
+  const { moduleId } = route.params; // Get moduleId from parameters
+
+  const [loading, setLoading] = useState(true);
+  const [moduleDetails, setModuleDetails] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleQuizzesPress = () => {
     console.log("Navigate to Quizzes page");
@@ -40,9 +46,8 @@ const ModuleDetails = () => {
 
       const file = result.assets[0];
 
-      // Validate file size (10MB limit)
       const fileInfo = await FileSystem.getInfoAsync(file.uri);
-      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      const maxSize = 10 * 1024 * 1024;
 
       if (fileInfo.size > maxSize) {
         Alert.alert("File Too Large", "Please select a PDF file smaller than 10MB");
@@ -56,16 +61,6 @@ const ModuleDetails = () => {
       });
 
       Alert.alert("Success", `PDF selected: ${file.name}`);
-
-      // Upload file logic can go here
-      // const formData = new FormData();
-      // formData.append('pdf', {
-      //   uri: file.uri,
-      //   type: 'application/pdf',
-      //   name: file.name,
-      // });
-      // await uploadToServer(formData);
-
     } catch (error) {
       console.error("Error picking document:", error);
       Alert.alert("Error", "Failed to select PDF. Please try again.");
@@ -77,7 +72,6 @@ const ModuleDetails = () => {
   useEffect(() => {
     const fetchModuleDetails = () => {
       setTimeout(() => {
-        // Mock module details (can replace with real data later)
         setModuleDetails({
           moduleName: "CS2102",
           description: "Introduction to Database Systems.",
@@ -100,18 +94,30 @@ const ModuleDetails = () => {
   }
 
   return (
-    <SafeAreaView style={{ backgroundColor: "#1c1c1c", flex: 1 }}>
-      <ScrollView style={{ paddingHorizontal: 16, paddingTop: 20 }}>
-        {/* Module Header */}
-        <View style={{ marginTop: 20 }}>
-          <Text style={{ fontSize: 32, color: "white", fontWeight: "600" }}>{moduleDetails.moduleName}</Text>
-          <Text style={{ fontSize: 18, color: "#d3d3d3", marginTop: 10 }}>{moduleDetails.description}</Text>
-          <Text style={{ fontSize: 16, color: "white", marginTop: 20 }}>Instructor: {moduleDetails.instructor}</Text>
-          <Text style={{ fontSize: 16, color: "white", marginTop: 10 }}>Credits: {moduleDetails.credits}</Text>
-        </View>
-
-        {/* Quizzes and Summaries Buttons */}
-        <View style={{ marginTop: 30, gap: 16 }}>
+    <SafeAreaView className="flex-1 bg-primary">
+      <FlatList
+        data={[]}
+        ListHeaderComponent={() => (
+          <View className="px-4 space-y-6" style={{ marginTop: 30 }}>
+            <View className="flex-row justify-between items-center">
+              <View>
+                <Text className="text-4xl font-semibold text-white">Module details</Text>
+                <Text className="text-3xl font-semibold text-gray-100 mt-2 mb-5 ">
+                  {moduleId} {/* Display the moduleId */}
+                </Text>
+              </View>
+              <Image
+                source={images.logoSmall}
+                className="w-12 h-12"
+                resizeMode="contain"
+              />
+            </View>
+          </View>
+        )}
+        renderItem={null}
+        keyExtractor={(item, index) => index.toString()}
+      />
+      <View style={{ marginTop: 30, gap: 16 }}>
           <TouchableOpacity
             onPress={handleQuizzesPress}
             style={{
@@ -129,6 +135,7 @@ const ModuleDetails = () => {
           >
             <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>Quizzes</Text>
           </TouchableOpacity>
+          
 
           <TouchableOpacity
             onPress={handleSummariesPress}
@@ -187,7 +194,6 @@ const ModuleDetails = () => {
             </View>
           )}
         </View>
-      </ScrollView>
     </SafeAreaView>
   );
 };
