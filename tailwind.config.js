@@ -22,8 +22,8 @@ module.exports = {
           400: "#fb7185",
         },
         blue: {
-          300: "#67e8f9",
-          400: "#22d3ee",
+          300: "#2563EB",
+          400: "#60A5FA",
         },
       },
       fontFamily: {

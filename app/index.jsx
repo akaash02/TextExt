@@ -21,13 +21,13 @@ const Welcome = () => {
       >
         <View className="w-full flex justify-center items-center h-full px-4 bg-black">
           <Image
-            source={images.logoText}
+            source={images.logo}
             className="w-[150px] h-[84px]"
             resizeMode="contain"
           />
 
           <Image
-            source={images.logoSmall}
+            source={images.cards}
             className="max-w-[165px] w-full h-[298px]"
             resizeMode="contain"
           />
