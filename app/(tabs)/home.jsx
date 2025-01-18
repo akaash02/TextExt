@@ -59,6 +59,11 @@ const Home = () => {
     navigation.navigate("create"); // Navigate to the create page
   };
 
+  const handleModulePress = (moduleName) => {
+    // Navigate to the 'ModuleDetails' page and pass the moduleName
+    navigation.navigate("moduleDetails", { moduleName });
+  };
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
