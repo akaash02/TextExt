@@ -122,7 +122,7 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#161622",  },
+    backgroundColor: "#060606",  },
   content: {
     flex: 1,
   },
